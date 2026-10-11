@@ -1,0 +1,22 @@
+{
+  "name": "educapt-ai",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Educapt AI — Adaptive digital reading workspace for neurodivergent students and diverse learning preferences.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "vite": "^8.3.0"
+  }
+}

@@ -1,0 +1,170 @@
+/* ==========================================================================
+   EDUCAPT AI — DOCUMENTS LIBRARY VIEW
+   Lead: Member 1 (Frontend & CSS Accessibility Engine Lead)
+   ========================================================================== */
+
+.libraryWrapper {
+  flex: 1;
+  padding: 3rem 2rem 6rem 2rem;
+  max-width: 960px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.headerSection {
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.docList {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.docRow {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: all var(--transition-fast);
+}
+
+.docRow:hover {
+  border-color: var(--accent-primary);
+  box-shadow: var(--shadow-md);
+}
+
+:global([data-high-contrast="true"]) .docRow {
+  background: #000000;
+  border: 2px solid #ffffff;
+}
+
+:global([data-high-contrast="true"]) .docRow:hover {
+  border-color: #ffff00;
+}
+
+.rowHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.docMeta {
+  display: flex;
+  gap: 0.625rem;
+  align-items: center;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
+:global([data-high-contrast="true"]) .docMeta {
+  color: #ffffea;
+}
+
+.subjectPill {
+  background: var(--accent-subtle);
+  color: var(--accent-primary);
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-full);
+}
+
+:global([data-high-contrast="true"]) .subjectPill {
+  background: #ffff00;
+  color: #000000;
+}
+
+.rowTitle {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.rowAbstract {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.rowFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--border-color);
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+}
+
+:global([data-high-contrast="true"]) .rowFooter {
+  border-top: 1px solid #ffffff;
+}
+
+.actionBtns {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.openBtn {
+  background: var(--accent-primary);
+  color: var(--text-on-accent);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  transition: background var(--transition-fast);
+}
+
+.openBtn:hover {
+  background: var(--accent-hover);
+}
+
+:global([data-high-contrast="true"]) .openBtn {
+  background: #ffff00;
+  color: #000000;
+  font-weight: 700;
+}
+
+.mapBtn {
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+
+.mapBtn:hover {
+  background: var(--accent-subtle);
+}
+
+:global([data-high-contrast="true"]) .mapBtn {
+  background: #000000;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+}

@@ -1,0 +1,265 @@
+/* ==========================================================================
+   EDUCAPT AI — DOCUMENT VIEWER
+   Semantic, typography-adaptive reading pane for neurodivergent students
+   ========================================================================== */
+
+.viewerContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+  background-color: var(--bg-reader);
+  transition: background-color var(--transition-normal);
+}
+
+/* Reading Progress Bar at the top of the reader */
+.progressBarWrapper {
+  position: sticky;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background-color: var(--progress-track);
+  z-index: 50;
+}
+
+.progressBarFill {
+  height: 100%;
+  background-color: var(--progress-bar);
+  transition: width var(--transition-fast);
+}
+
+:global([data-high-contrast="true"]) .progressBarFill {
+  background-color: #ffff00;
+}
+
+/* Top Document Header Banner */
+.docHeader {
+  border-bottom: 1px solid var(--border-color);
+  padding: 2.5rem 2rem 2rem 2rem;
+  background-color: var(--bg-surface);
+  display: flex;
+  justify-content: center;
+}
+
+:global([data-high-contrast="true"]) .docHeader {
+  border-bottom: 2px solid #ffffff;
+  background-color: #050505;
+}
+
+.headerInner {
+  width: 100%;
+  max-width: var(--reader-max-width, 72ch);
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.metadataRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+}
+
+:global([data-high-contrast="true"]) .metadataRow {
+  color: #ffffea;
+}
+
+.subjectBadge {
+  background-color: var(--accent-subtle);
+  color: var(--accent-primary);
+  font-weight: 600;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-full);
+}
+
+:global([data-high-contrast="true"]) .subjectBadge {
+  background-color: #ffff00;
+  color: #000000;
+  font-weight: 700;
+}
+
+.docTitle {
+  font-size: 2.25rem;
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.docSubtitle {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  font-weight: 400;
+}
+
+/* Active Mode Badges */
+.modeBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.modeBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color);
+}
+
+.modeBadgeActive {
+  background-color: var(--accent-subtle);
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
+}
+
+:global([data-high-contrast="true"]) .modeBadgeActive {
+  background-color: #ffff00;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+/* Reading Content Article Region */
+.articleWrapper {
+  display: flex;
+  justify-content: center;
+  padding: 3rem 2rem 8rem 2rem;
+}
+
+.articleBody {
+  width: 100%;
+  max-width: var(--reader-max-width, 72ch);
+  font-family: var(--reader-font-family);
+  font-size: var(--reader-font-size);
+  line-height: var(--reader-line-height);
+  letter-spacing: var(--reader-letter-spacing);
+  word-spacing: var(--reader-word-spacing);
+  text-align: var(--reader-text-align);
+  color: var(--text-primary);
+}
+
+/* Section Headings */
+.sectionTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  line-height: 1.35;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 0.5rem;
+}
+
+:global([data-high-contrast="true"]) .sectionTitle {
+  border-bottom: 2px solid #ffffff;
+}
+
+/* Paragraphs */
+.paragraph {
+  margin-bottom: var(--reader-paragraph-spacing);
+}
+
+/* Callout Box */
+.calloutBox {
+  margin: 1.75rem 0;
+  padding: 1.25rem 1.5rem;
+  background-color: var(--bg-callout);
+  border-left: 4px solid var(--accent-primary);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  box-shadow: var(--shadow-sm);
+}
+
+:global([data-high-contrast="true"]) .calloutBox {
+  background-color: #000000;
+  border: 2px solid #ffffff;
+  border-left: 8px solid #ffff00;
+}
+
+.calloutTitle {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--accent-primary);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+:global([data-high-contrast="true"]) .calloutTitle {
+  color: #ffff00;
+}
+
+.calloutContent {
+  font-size: 0.9375rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+/* Definition List for Vocabulary */
+.definitionList {
+  margin: 1.75rem 0;
+  padding: 1.25rem;
+  background-color: var(--bg-callout-vocab);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+:global([data-high-contrast="true"]) .definitionList {
+  background-color: #000000;
+  border: 2px solid #ffffff;
+}
+
+.defTerm {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 1rem;
+  margin-bottom: 0.25rem;
+}
+
+.defDescription {
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  margin-left: 0;
+}
+
+/* Bullet List */
+.readerList {
+  margin: 1.25rem 0;
+  padding-left: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.readerList li {
+  line-height: 1.6;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .docHeader {
+    padding: 1.5rem 1rem 1rem 1rem;
+  }
+  .docTitle {
+    font-size: 1.625rem;
+  }
+  .articleWrapper {
+    padding: 1.75rem 1rem 6rem 1rem;
+  }
+}

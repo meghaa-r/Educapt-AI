@@ -1,0 +1,154 @@
+/* ==========================================================================
+   EDUCAPT AI — MIND MAP PANEL (MEMBER 2 INTEGRATION POINT)
+   Lead: Member 1 (Frontend & CSS Accessibility Engine Lead)
+   ========================================================================== */
+
+.mindMapWrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--bg-surface);
+  padding: 2.5rem 2rem;
+}
+
+:global([data-high-contrast="true"]) .mindMapWrapper {
+  background-color: #000000;
+}
+
+.headerArea {
+  max-width: 900px;
+  margin: 0 auto 2rem auto;
+  width: 100%;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.panelTitle {
+  font-size: 1.875rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: var(--accent-subtle);
+  color: var(--accent-primary);
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--radius-full);
+}
+
+:global([data-high-contrast="true"]) .badge {
+  background: #ffff00;
+  color: #000000;
+}
+
+.panelSubtitle {
+  font-size: 1rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+/* Canvas Area */
+.canvasArea {
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+  min-height: 480px;
+  background-color: var(--bg-primary);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+:global([data-high-contrast="true"]) .canvasArea {
+  background-color: #050505;
+  border: 2px dashed #ffffff;
+}
+
+/* Empty State Card */
+.emptyStateCard {
+  max-width: 540px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.iconCircle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--accent-subtle);
+  color: var(--accent-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+:global([data-high-contrast="true"]) .iconCircle {
+  background: #ffff00;
+  color: #000000;
+}
+
+.emptyTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.emptyText {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Data Contract Code Box */
+.contractBox {
+  width: 100%;
+  text-align: left;
+  background: var(--bg-surface-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1rem;
+  font-family: monospace;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  overflow-x: auto;
+}
+
+:global([data-high-contrast="true"]) .contractBox {
+  background: #000000;
+  border: 1px solid #ffffff;
+  color: #ffffea;
+}
+
+/* Interactive SVG Diagram if nodes/edges supplied */
+.svgCanvas {
+  width: 100%;
+  height: 440px;
+}
+
+.nodeBox {
+  cursor: pointer;
+  transition: transform var(--transition-fast);
+}
+
+.nodeBox:hover {
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+}

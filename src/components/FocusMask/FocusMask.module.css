@@ -1,0 +1,130 @@
+/* ==========================================================================
+   EDUCAPT AI — FOCUS MASK (ADHD READING SPOTLIGHT)
+   CSS Module for smooth pointer tracking & reading guide overlays
+   ========================================================================== */
+
+.focusOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 9000;
+  overflow: hidden;
+  transition: opacity var(--transition-normal);
+}
+
+/* Spotlight mode: radial gradient cutout */
+.spotlightMode {
+  background: radial-gradient(
+    circle var(--focus-spotlight-size, 260px) at var(--focus-x, 50vw) var(--focus-y, 50vh),
+    transparent 0%,
+    transparent 70%,
+    rgba(10, 15, 25, calc(var(--focus-dim-opacity, 0.65) * 0.4)) 88%,
+    rgba(10, 15, 25, var(--focus-dim-opacity, 0.65)) 100%
+  );
+}
+
+/* High contrast mode spotlight: black backdrop with clean border circle */
+:global([data-high-contrast="true"]) .spotlightMode {
+  background: radial-gradient(
+    circle var(--focus-spotlight-size, 260px) at var(--focus-x, 50vw) var(--focus-y, 50vh),
+    transparent 0%,
+    transparent 96%,
+    rgba(0, 0, 0, 0.92) 100%
+  );
+}
+
+/* Reading Ruler / Guide Line mode: horizontal reading aperture */
+.guideLineMode {
+  background: linear-gradient(
+    to bottom,
+    rgba(10, 15, 25, var(--focus-dim-opacity, 0.65)) 0%,
+    rgba(10, 15, 25, var(--focus-dim-opacity, 0.65)) calc(var(--focus-y, 50vh) - 45px),
+    transparent calc(var(--focus-y, 50vh) - 40px),
+    transparent calc(var(--focus-y, 50vh) + 40px),
+    rgba(10, 15, 25, var(--focus-dim-opacity, 0.65)) calc(var(--focus-y, 50vh) + 45px),
+    rgba(10, 15, 25, var(--focus-dim-opacity, 0.65)) 100%
+  );
+}
+
+:global([data-high-contrast="true"]) .guideLineMode {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.94) 0%,
+    rgba(0, 0, 0, 0.94) calc(var(--focus-y, 50vh) - 50px),
+    transparent calc(var(--focus-y, 50vh) - 48px),
+    transparent calc(var(--focus-y, 50vh) + 48px),
+    rgba(0, 0, 0, 0.94) calc(var(--focus-y, 50vh) + 50px),
+    rgba(0, 0, 0, 0.94) 100%
+  );
+}
+
+/* Accessible status badge & quick escape control */
+.statusBadge {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 1.25rem;
+  z-index: 9005;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  background: var(--bg-surface-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  backdrop-filter: blur(8px);
+}
+
+:global([data-high-contrast="true"]) .statusBadge {
+  background: #000000;
+  color: #ffffff;
+  border: 2px solid #ffff00;
+}
+
+.pulsingDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--accent-primary);
+  display: inline-block;
+}
+
+.hintText {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+:global([data-high-contrast="true"]) .hintText {
+  color: #ffffea;
+}
+
+.dismissBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-subtle);
+  color: var(--accent-primary);
+  border-radius: var(--radius-full);
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  transition: background var(--transition-fast);
+}
+
+.dismissBtn:hover {
+  background: var(--accent-primary);
+  color: var(--text-on-accent);
+}
+
+:global([data-high-contrast="true"]) .dismissBtn {
+  background: #ffff00;
+  color: #000000;
+  font-weight: 700;
+}

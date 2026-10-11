@@ -1,0 +1,57 @@
+/* ==========================================================================
+   EDUCAPT AI — THEME TOGGLE
+   Accessible theme picker supporting Light, Dark, Warm, and Low-Sensory
+   ========================================================================== */
+
+.themeContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-full);
+  padding: 0.25rem;
+}
+
+:global([data-high-contrast="true"]) .themeContainer {
+  border: 2px solid #ffffff;
+  background: #000000;
+}
+
+.themeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.625rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  transition: all var(--transition-fast);
+}
+
+.themeBtn:hover {
+  color: var(--text-primary);
+  background: var(--accent-subtle);
+}
+
+.themeBtnActive {
+  background: var(--accent-primary) !important;
+  color: var(--text-on-accent) !important;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+:global([data-high-contrast="true"]) .themeBtnActive {
+  background: #ffff00 !important;
+  color: #000000 !important;
+  font-weight: 700;
+}
+
+.iconSvg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}

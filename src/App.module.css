@@ -1,0 +1,27 @@
+/* ==========================================================================
+   EDUCAPT AI — MAIN APP LAYOUT
+   Responsive application shell connecting sidebar, reader, and a11y engine
+   ========================================================================== */
+
+.appShell {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  position: relative;
+}
+
+.mainContentArea {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Prevents flex children overflow */
+  min-height: 100vh;
+}
+
+@media (max-width: 900px) {
+  .mainContentArea {
+    padding-top: 3.5rem; /* Room for mobile hamburger */
+  }
+}
