@@ -1,13 +1,10 @@
-/**
- * EDUCAPT AI — APPLICATION ROOT
- * Adaptive digital reading workspace for neurodivergent learners.
- * Lead: Member 1 (Frontend & CSS Accessibility Engine Lead)
- */
 
 import React, { useState, useEffect } from 'react';
 import { AccessibilityProvider } from './contexts/AccessibilityContext';
 import { useAccessibilitySettings } from './hooks/useAccessibilitySettings';
 import { SAMPLE_DOCUMENTS } from './data/sampleDocuments';
+import { getDocuments, getDocument } from './services/documentService';
+
 import Sidebar from './components/Sidebar/Sidebar';
 import DocumentViewer from './components/DocumentViewer/DocumentViewer';
 import FloatingToolbar from './components/FloatingToolbar/FloatingToolbar';
@@ -18,7 +15,6 @@ import DocumentsView from './components/DocumentsView/DocumentsView';
 import MindMapPanel from './components/MindMapPanel/MindMapPanel';
 import styles from './App.module.css';
 
-// Sample mind map node structure for Photosynthesis (Member 2 integration demonstration)
 const SAMPLE_MINDMAP_DATA = {
   'doc-photosynthesis': {
     nodes: [
@@ -27,7 +23,7 @@ const SAMPLE_MINDMAP_DATA = {
       { id: 'n3', label: 'Thylakoid Membrane', x: 220, y: 260, type: 'component' },
       { id: 'n4', label: 'Light Reactions', x: 220, y: 350, type: 'process' },
       { id: 'n5', label: 'Calvin Cycle (Stroma)', x: 580, y: 260, type: 'process' },
-      { id: 'n6', label: 'Glucose & Oxygen', x: 580, y: 350, type: 'output' }
+      { id: 'n6', label: 'Glucose & Oxygen', x: 580, y: 350, type: 'output' },
     ],
     edges: [
       { id: 'e1', source: 'n1', target: 'n2', label: 'powers' },
@@ -35,28 +31,128 @@ const SAMPLE_MINDMAP_DATA = {
       { id: 'e3', source: 'n3', target: 'n4', label: 'executes' },
       { id: 'e4', source: 'n2', target: 'n5', label: 'contains' },
       { id: 'e5', source: 'n4', target: 'n5', label: 'ATP & NADPH' },
-      { id: 'e6', source: 'n5', target: 'n6', label: 'yields' }
-    ]
-  }
+      { id: 'e6', source: 'n5', target: 'n6', label: 'yields' },
+    ],
+  },
 };
+
+function formatApiDocument(doc) {
+  const content = doc.content || '';
+
+  const paragraphs = content
+    .split(/\n\s*\n|\r?\n/)
+    .map((paragraph) => paragraph.trim())
+    .filter(Boolean);
+
+  const wordCount = content.trim()
+    ? content.trim().split(/\s+/).length
+    : 0;
+
+  return {
+    ...doc,
+    subject: 'Uploaded Document',
+    gradeLevel: 'Your Library',
+    subtitle: doc.filename || doc.title,
+    readTimeMinutes: Math.max(1, Math.ceil(wordCount / 200)),
+    wordCount,
+    summary: content
+      ? content.slice(0, 240) + (content.length > 240 ? '...' : '')
+      : 'Select this document to load its content.',
+    sections: [
+      {
+        id: 'document-content',
+        heading: 'Document Text',
+        paragraphs: paragraphs.length
+          ? paragraphs
+          : ['No readable text is available.'],
+      },
+    ],
+  };
+}
 
 function EducaptApp() {
   const { liveAnnouncement } = useAccessibilitySettings();
-  const [activeView, setActiveView] = useState('reader'); // 'home' | 'documents' | 'reader' | 'mindmap'
+
+  const [activeView, setActiveView] = useState('reader');
   const [currentDocId, setCurrentDocId] = useState(SAMPLE_DOCUMENTS[0].id);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [documents, setDocuments] = useState(SAMPLE_DOCUMENTS);
+  const [currentDoc, setCurrentDoc] = useState(SAMPLE_DOCUMENTS[0]);
 
-  const currentDoc = SAMPLE_DOCUMENTS.find(d => d.id === currentDocId) || SAMPLE_DOCUMENTS[0];
-  const mindMapData = SAMPLE_MINDMAP_DATA[currentDocId] || { nodes: [], edges: [] };
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadDocuments() {
+      try {
+        const apiDocuments = await getDocuments();
+
+        if (cancelled) return;
+
+        if (apiDocuments.length === 0) {
+          setDocuments(SAMPLE_DOCUMENTS);
+          return;
+        }
+
+        setDocuments(
+          apiDocuments.map((doc) => formatApiDocument(doc))
+        );
+
+        const firstDocument = apiDocuments[0];
+        setCurrentDocId(firstDocument.id);
+
+        const details = await getDocument(firstDocument.id);
+
+        if (!cancelled) {
+          setCurrentDoc(formatApiDocument(details));
+        }
+      } catch (error) {
+        console.error('Could not load backend documents:', error);
+
+        if (!cancelled) {
+          setDocuments(SAMPLE_DOCUMENTS);
+        }
+      }
+    }
+
+    loadDocuments();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function handleSelectDocument(id) {
+    setCurrentDocId(id);
+    setActiveView('reader');
+
+    const sampleDocument = SAMPLE_DOCUMENTS.find(
+      (doc) => doc.id === id
+    );
+
+    if (sampleDocument) {
+      setCurrentDoc(sampleDocument);
+      return;
+    }
+
+    try {
+      const details = await getDocument(id);
+      setCurrentDoc(formatApiDocument(details));
+    } catch (error) {
+      console.error('Could not open document:', error);
+    }
+  }
+
+  const mindMapData = SAMPLE_MINDMAP_DATA[currentDocId] || {
+    nodes: [],
+    edges: [],
+  };
 
   return (
     <div className={styles.appShell}>
-      {/* 1. WCAG 2.1 AA Skip-to-content Link */}
       <a href="#reader-content" className="skip-link">
         Skip to reading content
       </a>
 
-      {/* 2. Screen-reader Live Announcements Region */}
       <div
         role="status"
         aria-live="polite"
@@ -66,28 +162,20 @@ function EducaptApp() {
         {liveAnnouncement}
       </div>
 
-      {/* 3. Navigation Sidebar */}
       <Sidebar
         activeView={activeView}
         onSelectView={setActiveView}
-        documents={SAMPLE_DOCUMENTS}
+        documents={documents}
         currentDocId={currentDocId}
-        onSelectDocument={(id) => {
-          setCurrentDocId(id);
-          setActiveView('reader');
-        }}
+        onSelectDocument={handleSelectDocument}
         onOpenSettings={() => setIsSettingsOpen(true)}
       />
 
-      {/* 4. Main Content Area */}
       <div className={styles.mainContentArea}>
         {activeView === 'home' && (
           <HomeView
-            documents={SAMPLE_DOCUMENTS}
-            onSelectDocument={(id) => {
-              setCurrentDocId(id);
-              setActiveView('reader');
-            }}
+            documents={documents}
+            onSelectDocument={handleSelectDocument}
             onOpenSettings={() => setIsSettingsOpen(true)}
             onStartReading={() => setActiveView('reader')}
           />
@@ -95,11 +183,8 @@ function EducaptApp() {
 
         {activeView === 'documents' && (
           <DocumentsView
-            documents={SAMPLE_DOCUMENTS}
-            onSelectDocument={(id) => {
-              setCurrentDocId(id);
-              setActiveView('reader');
-            }}
+            documents={documents}
+            onSelectDocument={handleSelectDocument}
             onOpenMindMap={(id) => {
               setCurrentDocId(id);
               setActiveView('mindmap');
@@ -115,7 +200,7 @@ function EducaptApp() {
           <MindMapPanel
             nodes={mindMapData.nodes}
             edges={mindMapData.edges}
-            documentTitle={currentDoc.title}
+            documentTitle={currentDoc?.title || 'Document'}
             onNodeClick={(node) => {
               console.log('Mind map node selected:', node.label);
             }}
@@ -123,15 +208,12 @@ function EducaptApp() {
         )}
       </div>
 
-      {/* 5. Floating Accessibility Toolbar */}
       <FloatingToolbar
         onOpenSettings={() => setIsSettingsOpen(true)}
       />
 
-      {/* 6. ADHD Focus Mask (Overlays document without blocking interaction) */}
       <FocusMask />
 
-      {/* 7. Comprehensive Accessibility Settings Drawer */}
       <AccessibilitySettings
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}

@@ -32,4 +32,12 @@ dist-ssr
 
 # Testing & Coverage
 coverage/
+
+# Python backend
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
 .turbo/
