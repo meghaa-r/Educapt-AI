@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { AccessibilityProvider } from './contexts/AccessibilityContext';
 import { useAccessibilitySettings } from './hooks/useAccessibilitySettings';
 import { SAMPLE_DOCUMENTS } from './data/sampleDocuments';
@@ -12,128 +12,100 @@ import AccessibilitySettings from './components/AccessibilitySettings/Accessibil
 import FocusMask from './components/FocusMask/FocusMask';
 import HomeView from './components/HomeView/HomeView';
 import DocumentsView from './components/DocumentsView/DocumentsView';
-import MindMapPanel from './components/MindMapPanel/MindMapPanel';
+import AuthView from './components/AuthView/AuthView';
 import styles from './App.module.css';
 
-const SAMPLE_MINDMAP_DATA = {
-  'doc-photosynthesis': {
-    nodes: [
-      { id: 'n1', label: 'Solar Photons', x: 180, y: 80, type: 'source' },
-      { id: 'n2', label: 'Chloroplast', x: 400, y: 150, type: 'core' },
-      { id: 'n3', label: 'Thylakoid Membrane', x: 220, y: 260, type: 'component' },
-      { id: 'n4', label: 'Light Reactions', x: 220, y: 350, type: 'process' },
-      { id: 'n5', label: 'Calvin Cycle (Stroma)', x: 580, y: 260, type: 'process' },
-      { id: 'n6', label: 'Glucose & Oxygen', x: 580, y: 350, type: 'output' },
-    ],
-    edges: [
-      { id: 'e1', source: 'n1', target: 'n2', label: 'powers' },
-      { id: 'e2', source: 'n2', target: 'n3', label: 'houses' },
-      { id: 'e3', source: 'n3', target: 'n4', label: 'executes' },
-      { id: 'e4', source: 'n2', target: 'n5', label: 'contains' },
-      { id: 'e5', source: 'n4', target: 'n5', label: 'ATP & NADPH' },
-      { id: 'e6', source: 'n5', target: 'n6', label: 'yields' },
-    ],
-  },
-};
-
+// Helper: Format raw document payload for reader UI
 function formatApiDocument(doc) {
   const content = doc.content || '';
-
-  const paragraphs = content
-    .split(/\n\s*\n|\r?\n/)
-    .map((paragraph) => paragraph.trim())
-    .filter(Boolean);
-
-  const wordCount = content.trim()
-    ? content.trim().split(/\s+/).length
-    : 0;
+  const paragraphs = content.split(/\n\s*\n|\r?\n/).map(p => p.trim()).filter(Boolean);
+  const wordCount = content.trim() ? content.trim().split(/\s+/).length : 0;
 
   return {
     ...doc,
-    subject: 'Uploaded Document',
+    subject: doc.file_type ? doc.file_type.toUpperCase() : 'Uploaded Document',
     gradeLevel: 'Your Library',
     subtitle: doc.filename || doc.title,
     readTimeMinutes: Math.max(1, Math.ceil(wordCount / 200)),
     wordCount,
-    summary: content
-      ? content.slice(0, 240) + (content.length > 240 ? '...' : '')
-      : 'Select this document to load its content.',
-    sections: [
-      {
-        id: 'document-content',
-        heading: 'Document Text',
-        paragraphs: paragraphs.length
-          ? paragraphs
-          : ['No readable text is available.'],
-      },
-    ],
+    summary: content ? content.slice(0, 240) + (content.length > 240 ? '...' : '') : 'Select this document to load its content.',
+    sections: [{ id: 'document-content', heading: 'Document Text', paragraphs: paragraphs.length ? paragraphs : ['No readable text is available.'] }],
   };
 }
 
-function EducaptApp() {
-  const { liveAnnouncement } = useAccessibilitySettings();
+// Helper: Strict JWT Expiration & Validity Checker
+function isTokenValid(token) {
+  if (!token || token === 'null' || token === 'undefined' || !token.trim()) {
+    return false;
+  }
+  try {
+    const parts = token.split('.');
+    if (parts.length !== 3) return false;
+    
+    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+    if (payload.exp && payload.exp * 1000 < Date.now()) {
+      return false; // Token expired
+    }
+    return true;
+  } catch (err) {
+    return false; // Corrupted
+  }
+}
 
-  const [activeView, setActiveView] = useState('reader');
+// --- MAIN APPLICATION INTERIOR ---
+function EducaptApp({ onLogout }) {
+  const { liveAnnouncement } = useAccessibilitySettings();
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const [currentDocId, setCurrentDocId] = useState(SAMPLE_DOCUMENTS[0].id);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [documents, setDocuments] = useState(SAMPLE_DOCUMENTS);
   const [currentDoc, setCurrentDoc] = useState(SAMPLE_DOCUMENTS[0]);
 
+  const currentPath = location.pathname.replace('/', '');
+  const activeView = currentPath || 'home';
+
+  const refreshDocuments = async () => {
+    try {
+      const apiDocuments = await getDocuments();
+      if (apiDocuments && apiDocuments.length > 0) {
+        setDocuments(apiDocuments.map((doc) => formatApiDocument(doc)));
+      }
+    } catch (error) {
+      console.error('Could not refresh backend documents:', error);
+    }
+  };
+
   useEffect(() => {
     let cancelled = false;
-
     async function loadDocuments() {
       try {
         const apiDocuments = await getDocuments();
-
         if (cancelled) return;
+        if (!apiDocuments || apiDocuments.length === 0) return;
 
-        if (apiDocuments.length === 0) {
-          setDocuments(SAMPLE_DOCUMENTS);
-          return;
-        }
-
-        setDocuments(
-          apiDocuments.map((doc) => formatApiDocument(doc))
-        );
-
-        const firstDocument = apiDocuments[0];
-        setCurrentDocId(firstDocument.id);
-
-        const details = await getDocument(firstDocument.id);
-
-        if (!cancelled) {
-          setCurrentDoc(formatApiDocument(details));
-        }
+        setDocuments(apiDocuments.map((doc) => formatApiDocument(doc)));
+        setCurrentDocId(apiDocuments[0].id);
+        const details = await getDocument(apiDocuments[0].id);
+        if (!cancelled) setCurrentDoc(formatApiDocument(details));
       } catch (error) {
         console.error('Could not load backend documents:', error);
-
-        if (!cancelled) {
-          setDocuments(SAMPLE_DOCUMENTS);
-        }
       }
     }
-
     loadDocuments();
-
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, []);
 
   async function handleSelectDocument(id) {
     setCurrentDocId(id);
-    setActiveView('reader');
+    navigate('/reader');
 
-    const sampleDocument = SAMPLE_DOCUMENTS.find(
-      (doc) => doc.id === id
-    );
-
+    const sampleDocument = SAMPLE_DOCUMENTS.find(doc => doc.id === id);
     if (sampleDocument) {
       setCurrentDoc(sampleDocument);
       return;
     }
-
     try {
       const details = await getDocument(id);
       setCurrentDoc(formatApiDocument(details));
@@ -142,90 +114,96 @@ function EducaptApp() {
     }
   }
 
-  const mindMapData = SAMPLE_MINDMAP_DATA[currentDocId] || {
-    nodes: [],
-    edges: [],
-  };
-
   return (
     <div className={styles.appShell}>
-      <a href="#reader-content" className="skip-link">
-        Skip to reading content
-      </a>
-
-      <div
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-        className="sr-only"
-      >
-        {liveAnnouncement}
-      </div>
+      <a href="#reader-content" className="skip-link">Skip to reading content</a>
+      <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">{liveAnnouncement}</div>
 
       <Sidebar
         activeView={activeView}
-        onSelectView={setActiveView}
+        onSelectView={(view) => navigate(`/${view}`)}
         documents={documents}
         currentDocId={currentDocId}
         onSelectDocument={handleSelectDocument}
         onOpenSettings={() => setIsSettingsOpen(true)}
+        onLogout={onLogout}
       />
 
       <div className={styles.mainContentArea}>
-        {activeView === 'home' && (
-          <HomeView
-            documents={documents}
-            onSelectDocument={handleSelectDocument}
-            onOpenSettings={() => setIsSettingsOpen(true)}
-            onStartReading={() => setActiveView('reader')}
-          />
-        )}
-
-        {activeView === 'documents' && (
-          <DocumentsView
-            documents={documents}
-            onSelectDocument={handleSelectDocument}
-            onOpenMindMap={(id) => {
-              setCurrentDocId(id);
-              setActiveView('mindmap');
-            }}
-          />
-        )}
-
-        {activeView === 'reader' && (
-          <DocumentViewer document={currentDoc} />
-        )}
-
-        {activeView === 'mindmap' && (
-          <MindMapPanel
-            nodes={mindMapData.nodes}
-            edges={mindMapData.edges}
-            documentTitle={currentDoc?.title || 'Document'}
-            onNodeClick={(node) => {
-              console.log('Mind map node selected:', node.label);
-            }}
-          />
-        )}
+        <Routes>
+          <Route path="/" element={<Navigate to="/home" replace />} />
+          <Route path="/home" element={
+            <HomeView
+              documents={documents}
+              lastReadDocument={currentDoc}
+              onSelectDocument={handleSelectDocument}
+              onOpenSettings={() => setIsSettingsOpen(true)}
+              onStartReading={() => navigate('/reader')}
+            />
+          } />
+          <Route path="/documents" element={
+            <DocumentsView
+              documents={documents}
+              onSelectDocument={handleSelectDocument}
+              onDocumentUploaded={refreshDocuments}
+              onDocumentDeleted={refreshDocuments}
+            />
+          } />
+          <Route path="/reader" element={<DocumentViewer document={currentDoc} />} />
+        </Routes>
       </div>
 
-      <FloatingToolbar
-        onOpenSettings={() => setIsSettingsOpen(true)}
-      />
-
+      <FloatingToolbar onOpenSettings={() => setIsSettingsOpen(true)} />
       <FocusMask />
-
-      <AccessibilitySettings
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-      />
+      <AccessibilitySettings isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
     </div>
   );
 }
 
+// --- GATEKEEPER ---
+function MainGatekeeper() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isChecking, setIsChecking] = useState(true);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    
+    // Strict validation check
+    if (isTokenValid(token)) {
+      setIsAuthenticated(true);
+    } else {
+      localStorage.removeItem('token'); // Clear stale/invalid tokens
+      setIsAuthenticated(false);
+    }
+    setIsChecking(false);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    setIsAuthenticated(false);
+  };
+
+  if (isChecking) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'var(--bg-reader, #f9fafb)' }}>
+        Loading...
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <AuthView onAuthSuccess={() => setIsAuthenticated(true)} />;
+  }
+
+  return <EducaptApp onLogout={handleLogout} />;
+}
+
 export default function App() {
   return (
-    <AccessibilityProvider>
-      <EducaptApp />
-    </AccessibilityProvider>
+    <Router>
+      <AccessibilityProvider>
+        <MainGatekeeper />
+      </AccessibilityProvider>
+    </Router>
   );
 }

@@ -1,17 +1,18 @@
-
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+# Member 4's routes
 from app.routes.documents import router as documents_router
 from app.routes.auth import router as auth_router
 
-from contextlib import asynccontextmanager
-
-from fastapi import FastAPI
+# YOUR AI routes
+from .ai_routes import router as ai_router
 
 from app.database.connection import (
     check_database_connection,
     close_database_connection,
 )
-
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -25,13 +26,13 @@ async def lifespan(app: FastAPI):
     await close_database_connection()
     print("MongoDB connection closed.")
 
-
 app = FastAPI(
     title="Educapt AI API",
     description="Backend API for the Educapt AI reading workspace",
     version="1.0.0",
     lifespan=lifespan,
 )
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -42,20 +43,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Attach all the routers to the main app
 app.include_router(documents_router)
 app.include_router(auth_router)
-
-
+app.include_router(ai_router)
 
 @app.get("/")
 async def home():
     return {"message": "Educapt AI backend is running!"}
 
-
 @app.get("/health")
 async def health_check():
     return {"status": "healthy"}
-
 
 @app.get("/health/database")
 async def database_health_check():

@@ -177,3 +177,34 @@ async def get_document(
         **serialize_document(document),
         "content": document["content"],
     }
+
+
+@router.delete(
+    "/{document_id}",
+    status_code=status.HTTP_200_OK,
+)
+async def delete_document(
+    document_id: str,
+    current_user: dict = Depends(get_current_user),
+):
+    if not ObjectId.is_valid(document_id):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid document ID",
+        )
+
+    # Delete the document only if it belongs to the logged-in user
+    result = await documents_collection.delete_one(
+        {
+            "_id": ObjectId(document_id),
+            "user_id": str(current_user["_id"]),
+        }
+    )
+
+    if result.deleted_count == 0:
+        raise HTTPException(
+            status_code=404,
+            detail="Document not found",
+        )
+
+    return {"message": "Document successfully deleted"}

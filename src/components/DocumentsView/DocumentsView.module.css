@@ -1,55 +1,165 @@
 /* ==========================================================================
    EDUCAPT AI — DOCUMENTS LIBRARY VIEW
-   Lead: Member 1 (Frontend & CSS Accessibility Engine Lead)
+   Clean, professional layout replacing obsolete components
    ========================================================================== */
 
 .libraryWrapper {
   flex: 1;
-  padding: 3rem 2rem 6rem 2rem;
-  max-width: 960px;
+  padding: 2rem 2.5rem;
+  max-width: 1000px;
   margin: 0 auto;
   width: 100%;
 }
 
+/* Header Section */
 .headerSection {
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 16px;
+  padding: 2rem 2.5rem;
   margin-bottom: 2rem;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.03);
+}
+
+.headerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.headerBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--accent-primary, #0284c7);
+  background: var(--accent-subtle, #e0f2fe);
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  margin-bottom: 0.75rem;
+}
+
+.pulseDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--accent-primary, #0284c7);
 }
 
 .title {
   font-size: 2rem;
   font-weight: 800;
-  color: var(--text-primary);
-  margin-bottom: 0.5rem;
+  color: var(--text-primary, #0f172a);
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.02em;
 }
 
 .subtitle {
-  font-size: 1rem;
-  color: var(--text-muted);
+  font-size: 0.95rem;
+  color: var(--text-secondary, #475569);
+  margin: 0;
 }
 
+/* Upload Button */
+.uploadBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--accent-primary, #0284c7);
+  color: #ffffff;
+  padding: 0.85rem 1.5rem;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.uploadBtn:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.uploadBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Empty State */
+.emptyState {
+  background: var(--bg-surface, #ffffff);
+  border: 1px dashed var(--border-color, #cbd5e1);
+  border-radius: 16px;
+  padding: 4rem 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.emptyIcon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--bg-surface-elevated, #f8fafc);
+  color: var(--text-muted, #94a3b8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.emptyState h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary, #0f172a);
+  margin: 0;
+}
+
+.emptyState p {
+  font-size: 0.95rem;
+  color: var(--text-secondary, #64748b);
+  margin: 0;
+}
+
+/* Document List */
 .docList {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .docRow {
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  padding: 1.75rem;
+  background: var(--bg-surface, #ffffff);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 12px;
+  padding: 1.5rem 1.75rem;
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  box-shadow: var(--shadow-sm);
-  transition: all var(--transition-fast);
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .docRow:hover {
-  border-color: var(--accent-primary);
-  box-shadow: var(--shadow-md);
+  border-color: var(--accent-primary, #0284c7);
+  box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
 }
 
+.fadingOut {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* High Contrast Adjustments */
 :global([data-high-contrast="true"]) .docRow {
   background: #000000;
   border: 2px solid #ffffff;
@@ -59,20 +169,20 @@
   border-color: #ffff00;
 }
 
-.rowHeader {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
+/* Row Content */
+.rowMain {
+  flex: 1;
+  min-width: 0; /* Prevents flex overflow */
 }
 
 .docMeta {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.625rem;
   align-items: center;
   font-size: 0.8125rem;
-  color: var(--text-muted);
-  margin-bottom: 0.35rem;
+  color: var(--text-muted, #64748b);
+  margin-bottom: 0.5rem;
 }
 
 :global([data-high-contrast="true"]) .docMeta {
@@ -80,91 +190,153 @@
 }
 
 .subjectPill {
-  background: var(--accent-subtle);
-  color: var(--accent-primary);
+  background: var(--bg-surface-elevated, #f1f5f9);
+  color: var(--text-secondary, #475569);
   font-weight: 700;
   font-size: 0.75rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: var(--radius-full);
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-color, #e2e8f0);
 }
 
 :global([data-high-contrast="true"]) .subjectPill {
   background: #ffff00;
   color: #000000;
+  border: none;
 }
 
 .rowTitle {
-  font-size: 1.35rem;
+  font-size: 1.25rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-primary, #0f172a);
+  margin: 0 0 0.35rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .rowAbstract {
-  font-size: 0.9375rem;
-  color: var(--text-secondary);
-  line-height: 1.6;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #475569);
+  line-height: 1.5;
+  margin: 0 0 1.25rem 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.rowFooter {
+/* Visual Progress Bar */
+.progressContainer {
+  max-width: 320px;
+}
+
+.progressLabel {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid var(--border-color);
-  padding-top: 1rem;
-  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary, #64748b);
+  margin-bottom: 0.35rem;
 }
 
-:global([data-high-contrast="true"]) .rowFooter {
-  border-top: 1px solid #ffffff;
+.progressTrack {
+  height: 6px;
+  background: var(--bg-surface-elevated, #f1f5f9);
+  border-radius: 4px;
+  overflow: hidden;
 }
 
-.actionBtns {
+.progressBar {
+  height: 100%;
+  background: var(--accent-primary, #0284c7);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+:global([data-high-contrast="true"]) .progressBar {
+  background: #ffff00;
+}
+
+/* Actions Sidebar */
+.rowActions {
   display: flex;
+  align-items: center;
   gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .openBtn {
-  background: var(--accent-primary);
-  color: var(--text-on-accent);
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-md);
-  font-weight: 600;
+  background: var(--accent-subtle, #e0f2fe);
+  color: var(--accent-primary, #0284c7);
+  padding: 0.6rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 700;
   font-size: 0.875rem;
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  transition: background var(--transition-fast);
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
-.openBtn:hover {
-  background: var(--accent-hover);
+.docRow:hover .openBtn {
+  background: var(--accent-primary, #0284c7);
+  color: #ffffff;
 }
 
 :global([data-high-contrast="true"]) .openBtn {
-  background: #ffff00;
+  background: #ffffff;
   color: #000000;
-  font-weight: 700;
 }
 
-.mapBtn {
-  background: var(--bg-surface-elevated);
-  border: 1px solid var(--border-strong);
-  color: var(--text-primary);
-  padding: 0.5rem 1rem;
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  font-size: 0.875rem;
-  display: inline-flex;
+.deleteBtn {
+  background: transparent;
+  color: var(--text-muted, #94a3b8);
+  border: 1px solid var(--border-color, #e2e8f0);
+  padding: 0.6rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
   align-items: center;
-  gap: 0.375rem;
+  justify-content: center;
+  transition: all 0.2s ease;
 }
 
-.mapBtn:hover {
-  background: var(--accent-subtle);
+.deleteBtn:hover {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fca5a5;
 }
 
-:global([data-high-contrast="true"]) .mapBtn {
-  background: #000000;
-  border: 2px solid #ffffff;
-  color: #ffffff;
+/* Spinner Animation */
+.spinner {
+  animation: spin 1s linear infinite;
+  width: 18px;
+  height: 18px;
+}
+
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .docRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+  
+  .rowActions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+  
+  .progressContainer {
+    max-width: 100%;
+  }
 }
